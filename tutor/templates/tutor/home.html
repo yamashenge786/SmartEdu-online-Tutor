@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SmartEdu</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body style="background-color: rgba(121, 115, 115, 1);" class="min-h-screen flex flex-col">
+
+<!-- Navbar -->
+<nav style="background-color: rgba(70, 71, 77, 1);" class="w-full shadow-md">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+            <div style="color: rgba(255,255,255,1);" class="font-bold text-xl">
+                SmartEdu
+            </div>
+            <div class="hidden md:flex space-x-6 items-center">
+            
+                <a href="{% url 'primary_school' %}" style="color: rgba(255,255,255,1);" class="hover:text-gray-200">Primary School</a>
+                <a href="{% url 'secondary_school' %}" style="color: rgba(255,255,255,1);" class="hover:text-gray-200">Secondary School</a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main content -->
+<div class="flex flex-col items-center justify-center flex-grow pt-20 pb-10 px-4">
+    <h1 style="color: rgba(31,41,55,1);" class="text-4xl font-bold mb-12 text-center">Welcome to the CAPS Learning Portal</h1>
+
+    <div class="flex flex-col md:flex-row gap-8">
+        <a href="{% url 'primary_school' %}" style="background-color: rgba(61, 83, 69, 1);" class="hover:bg-blue-600 text-white px-8 py-6 rounded-lg shadow-md text-center w-64">
+            Primary School
+            <p style="color: rgba(229,231,235,1);" class="mt-2 text-sm">Grades 4 – 7</p>
+        </a>
+        <a href="{% url 'secondary_school' %}" style="background-color: rgba(61, 83, 69, 1);" class="hover:bg-green-600 text-white px-8 py-6 rounded-lg shadow-md text-center w-64">
+            Secondary School
+            <p style="color: rgba(229,231,235,1);" class="mt-2 text-sm">Grades 8 – 12</p>
+        </a>
+    </div>
+</div>
+
+<footer style="background-color: rgba(70, 71, 77, 1); color: rgba(229,231,235,1);" class="py-6 mt-auto w-full text-center">
+    © 2025 SmartEdu. All rights reserved.
+</footer>
+
+</body>
+</html>

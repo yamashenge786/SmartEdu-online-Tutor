@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Primary School</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<style>
+    body {
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+        background: url("{% static 'tutor/images/learning.avif' %}") no-repeat center center fixed;
+        background-size: cover;
+        min-height: 100vh;
+    }
+    .overlay { background-color: rgba(255,255,255,0.3); min-height:100vh; display:flex; flex-direction:column;}
+    .form-container { background-color: rgba(255,255,255,0.95); padding:30px; border-radius:12px; max-width:500px; margin:auto; box-shadow:0 10px 25px rgba(0,0,0,0.3);}
+    select, input { background-color:white; color:black; }
+    #result { display:none; margin-top:20px; padding:20px; background:white; border-left:4px solid #3b82f6; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.2);}
+</style>
+</head>
+<body>
+<div class="overlay">
+
+    <nav class="bg-gray-300 bg-opacity-50 p-4 shadow-md border-b-4 border-gray-200">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-gray-900 text-lg font-semibold">SmartEdu</a>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto p-6 flex justify-center items-start">
+        <div class="form-container">
+            <h1 class="text-2xl font-bold mb-4 text-center">Primary School Selection</h1>
+
+            <form method="post" id="primary-form" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label for="selected_grade" class="block font-semibold mb-1">Select Grade:</label>
+                    <select name="selected_grade" id="selected_grade" class="w-full border p-2 rounded" required>
+                        <option value="">-- Select Grade --</option>
+                        {% for grade in grades.keys %}
+                            <option value="{{ grade }}">{{ grade }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="selected_subject" class="block font-semibold mb-1">Select Subject:</label>
+                    <select name="selected_subject" id="selected_subject" class="w-full border p-2 rounded" required>
+                        <option value="">-- Select Subject --</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="resource_type" class="block font-semibold mb-1">Select Resource Type:</label>
+                    <select name="resource_type" id="resource_type" class="w-full border p-2 rounded" required>
+                        <option value="">-- Select Resource --</option>
+                        <option value="Quiz">Quiz</option>
+                        <option value="Lesson Plan">Lesson Plan</option>
+                        <option value="Chapter Summary">Chapter Summary</option>
+                        <option value="Homework">Homework</option>
+                        <option value="Study Guide">Study Guide</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="topic" class="block font-semibold mb-1">Enter Topic:</label>
+                    <input type="text" name="topic" id="topic" placeholder="Enter topic" class="w-full border p-2 rounded" required>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600">
+                        Generate
+                    </button>
+                </div>
+            </form>
+
+            <div id="result"></div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 bg-opacity-90 text-white py-6 mt-auto text-center">
+        <p>&copy; SmartEdu. All Rights Reserved.</p>
+        <p>Designed by yamaShenge</p>
+    </footer>
+</div>
+
+<script>
+const grades = {{ grades|safe }};
+const gradeSelect = document.getElementById('selected_grade');
+const subjectSelect = document.getElementById('selected_subject');
+const form = document.getElementById('primary-form');
+const resultDiv = document.getElementById('result');
+
+// Populate subjects dynamically
+gradeSelect.addEventListener('change', function() {
+    const selectedGrade = this.value;
+    subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
+    if (grades[selectedGrade]) {
+        grades[selectedGrade].forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelect.appendChild(option);
+        });
+    }
+});
+
+<form method="post" class="space-y-4">
+    {% csrf_token %}
+    <!-- Grade Selection -->
+    <div>
+        <label for="selected_grade" class="block font-semibold mb-1">Select Grade:</label>
+        <select name="selected_grade" id="selected_grade" class="w-full border p-2 rounded" required>
+            <option value="">-- Select Grade --</option>
+            {% for grade in grades.keys %}
+                <option value="{{ grade }}">{{ grade }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Subject Selection -->
+    <div>
+        <label for="selected_subject" class="block font-semibold mb-1">Select Subject:</label>
+        <select name="selected_subject" id="selected_subject" class="w-full border p-2 rounded" required>
+            <option value="">-- Select Subject --</option>
+        </select>
+    </div>
+
+    <!-- Resource Type -->
+    <div>
+        <label for="resource_type" class="block font-semibold mb-1">Select Resource Type:</label>
+        <select name="resource_type" id="resource_type" class="w-full border p-2 rounded" required>
+            <option value="">-- Select Resource --</option>
+            <option value="Quiz">Quiz</option>
+            <option value="Lesson Plan">Lesson Plan</option>
+            <option value="Chapter Summary">Chapter Summary</option>
+            <option value="Homework">Homework</option>
+            <option value="Study Guide">Study Guide</option>
+        </select>
+    </div>
+
+    <!-- Topic -->
+    <div>
+        <label for="topic" class="block font-semibold mb-1">Enter Topic:</label>
+        <input type="text" name="topic" id="topic" placeholder="Enter topic" class="w-full border p-2 rounded" required>
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600">
+            Generate
+        </button>
+    </div>
+</form>
+
+<script>
+const grades = {{ grades|safe }};
+const gradeSelect = document.getElementById('selected_grade');
+const subjectSelect = document.getElementById('selected_subject');
+
+// Populate subjects dynamically
+gradeSelect.addEventListener('change', function() {
+    const selectedGrade = this.value;
+    subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
+    if (grades[selectedGrade]) {
+        grades[selectedGrade].forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelect.appendChild(option);
+        });
+    }
+});
+</script>

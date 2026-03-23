@@ -1,0 +1,19 @@
+/* styles.css */
+body {
+    font-family: 'Arial', sans-serif;
+}
+.underline-cycling::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px; 
+    height: 3px; 
+    width: 100%;
+    background: linear-gradient(90deg, red, orange, yellow, green, blue, red);
+    background-size: 200% 100%;
+    animation: gradientShift 3s linear infinite;
+}
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}

@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secondary School CAPS Resources</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center pt-10">
+
+<h1 class="text-3xl font-bold mb-6 text-gray-800 text-center">Secondary School CAPS Resources</h1>
+
+<form id="resource-form" class="mb-8 bg-white p-6 rounded shadow-md w-full max-w-lg">
+    <div class="mb-4">
+        <label class="block font-semibold mb-1">Grade:</label>
+        <select id="grade" name="grade" class="border p-2 w-full rounded">
+            <option value="">Select Grade</option>
+            {% for grade, subjects in grades.items %}
+                <option value="{{ grade }}">{{ grade }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-4">
+        <label class="block font-semibold mb-1">Subject:</label>
+        <select id="subject" name="subject" class="border p-2 w-full rounded">
+            <option value="">Select Subject</option>
+        </select>
+    </div>
+
+    <div class="mb-4">
+        <label class="block font-semibold mb-1">Resource Type:</label>
+        <select id="resource_type" name="resource_type" class="border p-2 w-full rounded">
+            <option value="">Select Resource Type</option>
+            <option value="Quiz">Quiz</option>
+            <option value="Chapter Summary">Chapter Summary</option>
+            <option value="Lesson Plan">Lesson Plan</option>
+            <option value="Homework">Homework</option>
+            <option value="Studyguide">Studyguide</option>
+        </select>
+    </div>
+
+    <div class="mb-4">
+        <label class="block font-semibold mb-1">Topic:</label>
+        <input type="text" id="topic" name="topic" class="border p-2 w-full rounded" placeholder="Enter topic">
+    </div>
+
+    <button id="generate-btn" type="submit" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition w-full">
+        Generate Content
+    </button>
+</form>
+
+<div id="generated-content" class="bg-white p-6 rounded shadow-md w-full max-w-lg hidden mb-10"></div>
+
+<script>
+const grades_dict = {{ grades|safe }};
+
+// Populate subjects when grade changes
+$('#grade').on('change', function() {
+    const grade = $(this).val();
+    const subjects = grades_dict[grade] || [];
+    $('#subject').html('<option value="">Select Subject</option>');
+    subjects.forEach(sub => $('#subject').append(`<option value="${sub}">${sub}</option>`));
+    $('#generated-content').hide().html('');
+});
+
+// Submit form using AJAX GET
+$('#resource-form').on('submit', function(e) {
+    e.preventDefault();
+
+    const grade = $('#grade').val();
+    const subject = $('#subject').val();
+    const topic = $('#topic').val();
+    const content_type = $('#resource_type').val();
+
+    if(!grade || !subject || !topic || !content_type){
+        $('#generated-content').html('<p class="text-red-500">Please fill in all fields.</p>').show();
+        return;
+    }
+
+    $('#generate-btn').prop('disabled', true);
+    $('#generated-content').html('<p class="text-gray-600">Generating content...</p>').show();
+
+    $.ajax({
+        url: "{% url 'generate_caps_content' %}",   // <-- points to DeepSeek-powered view
+        type: "GET",
+        data: { grade, subject, topic, content_type },
+        headers: { "x-requested-with": "XMLHttpRequest" },
+        success: function(response) {
+            $('#generate-btn').prop('disabled', false);
+            if(response.ai_content){
+                $('#generated-content').html('<h2 class="font-bold text-xl mb-4">Generated Content</h2><p>' + response.ai_content + '</p>').show();
+            } else if(response.error){
+                $('#generated-content').html('<p class="text-red-500">'+response.error+'</p>').show();
+            }
+        },
+        error: function(xhr, status, error) {
+            $('#generate-btn').prop('disabled', false);
+            let msg = xhr.responseJSON?.error || error;
+            $('#generated-content').html('<p class="text-red-500">Error generating content: ' + msg + '</p>').show();
+        }
+    });
+});
+</script>
+
+</body>
+</html>

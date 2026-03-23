@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CAPS Content Generator</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>CAPS Content Generator</h1>
+
+  <label>Grade:</label>
+  <select id="grade">
+    {% for grade, subjects in grades.items %}
+      <option value="{{ grade }}">{{ grade }}</option>
+    {% endfor %}
+  </select>
+
+  <label>Subject:</label>
+  <select id="subject"></select>
+
+  <label>Topic:</label>
+  <input type="text" id="topic" placeholder="Enter topic">
+
+  <label>Resource Type:</label>
+  <select id="content_type">
+    <option value="Lesson Plan">Lesson Plan</option>
+    <option value="Worksheet">Worksheet</option>
+    <option value="Exam Questions">Exam Questions</option>
+    <option value="Study Notes">Study Notes</option>
+  </select>
+
+  <button id="generate">Generate</button>
+
+  <div id="result" style="margin-top:20px; border:1px solid #ccc; padding:10px;"></div>
+
+  <script>
+    const gradeSubjects = {{ grades|safe }};
+
+    function updateSubjects() {
+      const grade = $("#grade").val();
+      const subjects = gradeSubjects[grade] || [];
+      $("#subject").empty();
+      subjects.forEach(s => {
+        $("#subject").append(`<option value="${s}">${s}</option>`);
+      });
+    }
+
+    $("#grade").on("change", updateSubjects);
+    $(document).ready(updateSubjects);
+
+    $("#generate").click(function () {
+      $.ajax({
+        url: "/api/generate/",
+        method: "GET",
+        data: {
+          grade: $("#grade").val(),
+          subject: $("#subject").val(),
+          topic: $("#topic").val(),
+          content_type: $("#content_type").val(),
+        },
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+        success: function (data) {
+          $("#result").html("<pre>" + data.ai_content + "</pre>");
+        },
+        error: function (xhr) {
+          $("#result").html("<b>Error:</b> " + xhr.responseText);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
